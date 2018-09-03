@@ -1,6 +1,7 @@
 #! /bin/python3
 
-from project.parsing import equation_parser
+from parsing import equation_parser
+from solver import reduce_form, equation_solver
 
 
 def main():
@@ -9,11 +10,11 @@ def main():
     """
     equation = input('Please enter the polynomial equation to resolve : ')
 
-    try:
-        reduce_form = equation_parser(equation)
-    except Exception:
-        print('The current equation has not a correct format. Please correct it')
-        return
+    left, right = equation_parser(equation)
+
+    left = reduce_form(left, right)
+
+    equation_solver(left)
 
 
 if __name__ == "__main__":
