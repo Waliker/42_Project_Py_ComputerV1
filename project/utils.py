@@ -10,29 +10,29 @@ class PolynomialParser:
         self.eval_all_degrees()
 
     def split_equation(self, equation, x):
-        new_eq = re.split('([+-]?)\*' + x + '(\^[0-2])([+-]?)', equation)
-        new_eq = [x for x in new_eq if x != '']
-        print('new eq : ', new_eq)
-        return new_eq
+        pattern_degree = '([-+]?\\d+(?:\\.\\d+)?)?\\*?(' + x + ')?\\^?(\\d+)?'
+        polynomes = re.findall(pattern_degree, equation)
+        return polynomes
 
-    def find_degrees(self, equation):
-        value = 1.0
-        sign = 1
-        degrees = list(([], [], []))
+    def find_degrees(self, polynomes):
+        deg = {}
 
-        for x in equation:
-            if '-' in x:
-                sign = -1
-            elif '+' in x:
-                pass
-            elif '^' in x:
-                degrees[int(x[1])].append(sign * value)
-                sign = 1
-                value = 1
-            else:
-                value = float(x)
+        for x, y, z in polynomes:
+            if any(map(len, (x, y, z))):
+                k = z if z is not None else '1' if y is not None else '0'
+                if k in deg:
+                    deg[k].append(float(x)) if x else deg[k].append(float(1))
+                else:
+                    deg[k] = [float(x)] if x else [float(1)]
 
-        return degrees
+        return deg
+
+    def eval_max_degree(self):
+        m_degree = '0'
+        for key in self.degrees.keys():
+            if m_degree < key:
+                m_degree = key
+        self.max_degree = m_degree
 
     def eval_degree(self, degree):
         if len(self.degrees[degree]) > 1:
@@ -42,28 +42,31 @@ class PolynomialParser:
             self.degrees[degree] = [new_value]
 
     def eval_all_degrees(self):
-        it = 0
-        for degree in self.degrees:
-            self.eval_degree(it)
-            it += 1
+        for degree in self.degrees.keys():
+            self.eval_degree(degree)
+
+        self.degrees = {k: v for k, v in sorted(self.degrees.items()) if v and v[0] != 0}
+        self.eval_max_degree()
 
     def reduce_form(self, other_polynome):
-        self.degrees = [x + y for (x, y) in list(zip(self.degrees, other_polynome))]
+        new_dict = {}
+        merge_dict = sorted(self.degrees.items()) + sorted(other_polynome.items())
+        for k, v in merge_dict:
+            if k in new_dict:
+                new_dict[k] += v
+            else:
+                new_dict[k] = v
+        self.degrees = new_dict
         self.eval_all_degrees()
         return self
 
     def __repr__(self):
-        ret = ""
-        it = 0
-
-        for degree in self.degrees:
-            if degree:
-                if ret:
-                    ret = ret + ' + ' + str(degree[0]) if degree[0] > 0 else ret + ' ' + str(degree[0])
-                    ret = ret + ' * ' + self.factor + '^' + str(it)
-                else:
-                    ret = str(degree[0]) + ' * ' + self.factor + '^' + str(it)
-            it += 1
+        ret = ''
+        for k, v in self.degrees.items():
+            if ret and v[0] >= 0:
+                ret = ret + '+ '
+            ret = ret + str(v[0]) + ' * ' + self.factor if k > '0' else ret + str(v[0])
+            ret = ret + '^' + k + ' ' if k > '1' else ret + ' '
 
         ret = ret.replace('-', '- ')
         return ret

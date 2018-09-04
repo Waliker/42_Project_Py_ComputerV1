@@ -4,13 +4,11 @@ import sys
 from utils import PolynomialParser
 
 
-def equation_checker(equation):
-    unauthorized_char = '[^a-zA-Z0-9\+\-\*\^\.\=]'
+def syntax_checker(equation):
     if equation.count('=') != 1:
         print('SyntaxError : too many \'=\' in the equation')
 
-    equation = re.sub('\s', '', equation)
-
+    unauthorized_char = '[^a-zA-Z0-9\+\-\*\^\.\=]'
     errors = re.findall(unauthorized_char, equation)
 
     if errors:
@@ -24,29 +22,38 @@ def equation_checker(equation):
 
     factor = factor.pop()
 
-    degree = re.findall(factor + '\^([0-9' + factor + ']+)', equation)
-    degree = [x for x in degree if len(x) > 1 or x == factor]
-    if degree:
-        print('The equation degree is too high : {}'.format(degree[0]))
+    return factor
 
-    return equation, factor
+
+def polynomial_checker(equation, factor):
+    if re.search('[^' + factor + '0-9]$', equation) is not None:
+        print('Bad syntax at the end of the string')
+        sys.exit()
+
+    polynomial_re_pattern = '^(-?(\d+(\.\d+)?)?((?:[\*+-]X|^X)(\^[0-9]+)?)?[+-]?)+$'
+
+    match = re.match(polynomial_re_pattern, equation)
+    if match is None or match.group() != equation:
+        print('The equation is not well syntaxed')
+        sys.exit()
+
+
+def equation_checker(equation):
+    equation = re.sub('\s', '', equation)
+
+    factor = syntax_checker(equation)
+    left, right = equation.split(sep='=')
+
+    polynomial_checker(left, factor)
+    polynomial_checker(right, factor)
+
+    return left, right, factor
 
 
 def equation_parser(equation):
-    equation, factor = equation_checker(equation)
-    left, right = equation.split(sep='=')
+    left, right, factor = equation_checker(equation)
 
-    left_side = PolynomialParser(left, factor)
-    right_side = PolynomialParser(right, factor)
+    left = PolynomialParser(left, factor)
+    right = PolynomialParser(right, factor)
 
-    print('Left Side : \nFactor : {} \nEquation : {}\nPolynomial list : {}'.format(
-        left_side.factor, left_side.equation, left_side.degrees
-    ))
-
-    print('\nRight Side : \nFactor : {} \nEquation : {}\nPolynomial list : {}'.format(
-        right_side.factor, right_side.equation, right_side.degrees
-    ))
-    print(left_side)
-    print(right_side)
-
-    return left_side, right_side
+    return left, right
