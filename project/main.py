@@ -1,7 +1,7 @@
 #! /bin/python3
 
-from parsing import equation_parser
-from solver import reduce_form, equation_solver
+from project.parsing import equation_parser
+from project.solver import reduce_form, equation_solver
 
 
 def computor(equation):
@@ -10,7 +10,9 @@ def computor(equation):
     left = reduce_form(left, right)
 
     print('Polynomial degree : {}'.format(left.max_degree))
-    equation_solver(left)
+    solution = equation_solver(left)
+
+    return solution
 
 
 def main():

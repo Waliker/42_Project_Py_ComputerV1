@@ -1,7 +1,7 @@
 import re
 import sys
 
-from utils import PolynomialParser
+from project.utils import PolynomialParser
 
 
 def syntax_checker(equation):

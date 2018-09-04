@@ -69,6 +69,8 @@ class PolynomialParser:
             ret = ret + '^' + k + ' ' if k > '1' else ret + ' '
 
         ret = ret.replace('-', '- ')
+        if not ret:
+            ret = '0 '
         return ret
 
 

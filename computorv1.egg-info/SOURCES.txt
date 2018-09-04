@@ -1,0 +1,12 @@
+README.md
+computorv1.egg-info/PKG-INFO
+computorv1.egg-info/SOURCES.txt
+computorv1.egg-info/dependency_links.txt
+computorv1.egg-info/top_level.txt
+project/__init__.py
+project/main.py
+project/parsing.py
+project/solver.py
+project/utils.py
+tests/__init__.py
+tests/test_computorv1.py

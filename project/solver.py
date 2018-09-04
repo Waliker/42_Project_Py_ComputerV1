@@ -1,4 +1,4 @@
-from utils import my_sqrt
+from project.utils import my_sqrt
 
 
 def equation_transposition(expr):
@@ -11,7 +11,7 @@ def reduce_form(left, right):
     right = equation_transposition(right.degrees)
 
     left = left.reduce_form(right)
-    print('The reduced form is :{}= 0'.format(left))
+    print('The reduced form is : {}= 0'.format(left))
     return left
 
 
@@ -32,13 +32,15 @@ def second_find_solutions(poly):
         s1 = (-b + discri_sqrt) / (2 * a)
         s2 = (-b + - discri_sqrt) / (2 * a)
         print('Discriminant is striclty positive, the two solutions are :\n{}\n{}'.format(s1, s2))
+        return [s1, s2]
 
     elif discri == 0:
         s = -b / (2 * a)
         print('Discriminant is equal to 0, the solution is :\n{}'.format(s))
-
+        return s
     else:
         print('The equation has no real solution')
+        return None
 
 
 def first_find_solutions(poly):
@@ -46,14 +48,18 @@ def first_find_solutions(poly):
     solution = solution / poly['1'][0]
     print('The solution is :\n{}'.format(solution))
 
+    return solution
+
 
 def zero_find_solutions(poly):
     a = poly['0'] if '0' in poly.keys() else 0
 
     if a == 0:
         print('Every real numbers are solutions of this equation')
+        return 'Infiny'
     else:
         print('The equation is false')
+        return None
 
 
 def equation_solver(poly):
@@ -61,4 +67,4 @@ def equation_solver(poly):
     if poly.max_degree > '2':
         print('The degree is too high, the equation can not be solved')
     else:
-        func_solver[int(poly.max_degree)](poly.degrees)
+        return func_solver[int(poly.max_degree)](poly.degrees)
